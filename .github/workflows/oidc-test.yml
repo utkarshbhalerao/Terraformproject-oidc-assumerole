@@ -1,4 +1,4 @@
-name: OIDC Claims Debug
+name: OIDC Test
 
 on:
   workflow_dispatch:
@@ -8,20 +8,18 @@ permissions:
   contents: read
 
 jobs:
-  debug:
+  oidc-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print OIDC Token Claims
-        uses: actions/github-script@v7
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          script: |
-            const token = await core.getIDToken('sts.amazonaws.com');
+          role-to-assume: arn:aws:iam::970959930212:role/github-actions-role
+          aws-region: ap-south-1
 
-            const payload = JSON.parse(
-              Buffer.from(token.split('.')[1], 'base64').toString()
-            );
-
-            console.log("SUB:", payload.sub);
-            console.log("AUD:", payload.aud);
-            console.log(JSON.stringify(payload, null, 2));
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
