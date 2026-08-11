@@ -1,7 +1,10 @@
 terraform {
+  required_version = "~> 1.12"
+
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
     }
   }
 }
@@ -10,11 +13,15 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-resource "aws_instance" "test" {
+# Your resources below
+resource "aws_instance" "demo" {
   ami           = "ami-01a00762f46d584a1"
   instance_type = "t3.micro"
 
   tags = {
-    Name = "terraform-test"
+    Name        = "github-oidc-demo"
+    Environment = "dev"
+    ManagedBy   = "Terraform"
   }
 }
+
