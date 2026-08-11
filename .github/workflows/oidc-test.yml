@@ -1,4 +1,4 @@
-name: OIDC Test
+name: Terraform CI
 
 on:
   workflow_dispatch:
@@ -8,18 +8,39 @@ permissions:
   contents: read
 
 jobs:
-  oidc-test:
+  terraform:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::970959930212:role/github-actions-role
           aws-region: ap-south-1
 
-      - name: Verify AWS Identity
-        run: aws sts get-caller-identity
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: TFLint Init
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint
+
+      - name: Run TFSec
+        uses: aquasecurity/tfsec-action@v1.0.3
+
+      - name: Terraform Plan
+        run: terraform plan
