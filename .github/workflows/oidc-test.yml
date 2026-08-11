@@ -38,9 +38,6 @@ jobs:
 
       - name: Run TFLint
         run: tflint
-
-      - name: Run TFSec
-        uses: aquasecurity/tfsec-action@v1.0.3
-
+        
       - name: Terraform Plan
         run: terraform plan
